@@ -10,7 +10,7 @@ def deleta_ultimas_linhas(qtde_linhas, espera: int):
         sys.stdout.write(sobe_cursor)
         sys.stdout.write(apaga_linha)
 
-def limpar_tela():
+def limpa_tela():
     if os.name == 'nt':
         os.system('cls')
     else:
