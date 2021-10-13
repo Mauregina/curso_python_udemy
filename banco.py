@@ -1,10 +1,18 @@
-from utils.utils import deleta_ultimas_linhas, limpar_tela
+from utils.utils import deleta_ultimas_linhas, limpa_tela
+from models.conta import Conta
 
 def cria_conta():
-    pass
+    conta = Conta(novo = True)
+    conta.nome = input('Nome: ')
+    conta.email = input('E-mail: ')
+    conta.cpf = input('CPF (nnn.nnn.nnn-nn): ')
+    conta.data_nascimento = input('Data de nascimento (dd/mm/yyyy): ')
+    conta.salvar()
 
 def lista_contas():
-    pass
+    conta = Conta(novo = False)
+    conta.listar_contas()
+    input('\nTecle algo para voltar ao menu principal... ')
 
 def efetua_saque():
     pass
@@ -38,7 +46,7 @@ def menu() -> bool:
                 print('Menu nao contem essa opcao! Tente novamente...')
                 deleta_ultimas_linhas(qtde_linhas=2, espera=2)
             else:
-                limpar_tela()
+                limpa_tela()
                 break
     #Sair
     if opcao == 0:
@@ -46,6 +54,7 @@ def menu() -> bool:
 
     #Criar conta ------------------------------------------------------------------------------
     elif opcao == 1:
+        limpa_tela()
         cria_conta()
     #Listar contas ----------------------------------------------------------------------------
     elif opcao == 2:
@@ -66,7 +75,7 @@ def main():
     print('### BEM-VINDO AO BANCO ###\n')
 
     while continua:
-        limpar_tela()
+        limpa_tela()
         continua = menu()
 
 if __name__ == "__main__":
