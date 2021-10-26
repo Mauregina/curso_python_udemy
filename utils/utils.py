@@ -1,6 +1,6 @@
 import sys, time, os
 
-def deleta_ultimas_linhas(qtde_linhas, espera: int):
+def deletar_ultimas_linhas(qtde_linhas, espera: int):
     sobe_cursor = '\x1b[1A'
     apaga_linha = '\x1b[2K'
 
@@ -10,7 +10,7 @@ def deleta_ultimas_linhas(qtde_linhas, espera: int):
         sys.stdout.write(sobe_cursor)
         sys.stdout.write(apaga_linha)
 
-def limpa_tela():
+def limpar_tela():
     if os.name == 'nt':
         os.system('cls')
     else:
