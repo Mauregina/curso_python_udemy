@@ -28,14 +28,41 @@ def efetuar_deposito() -> None:
         num_conta = input("Informe o numero da conta (digite 0 para voltar ao menu principal): ")
 
         if conta.existe_conta(num_conta):
-            valor_dep = input("Informe o valor do deposito R$: ")
-            conta.depositar(valor_dep)
+            limpar_tela()
+            print('\n*********** Deposito ***********\n')
+            conta.exibir_dados_conta_especifica(num_conta)
+
+            valor = input("Informe o valor do deposito R$: ")
+            conta.depositar(valor)
+            limpar_tela()
+            print('\n*********** Deposito ***********\n')
+            conta.exibir_dados_conta_especifica(num_conta)
+
             input('\nDeposito realizado com sucesso! Tecle algo para voltar ao menu principal... ')
     else:
         input('\nNao ha contas cadastradas! Tecle algo para voltar ao menu principal... ')
 
-def efetuar_saque():
-    pass
+def efetuar_saque() -> None:
+    conta = Conta(novo = False)
+    print('\n*********** Saque ***********\n')
+
+    if Conta.contas:
+        num_conta = input("Informe o numero da conta (digite 0 para voltar ao menu principal): ")
+
+        if conta.existe_conta(num_conta):
+            limpar_tela()
+            print('\n*********** Saque ***********\n')
+            conta.exibir_dados_conta_especifica(num_conta)
+
+            valor = input("Informe o valor do saque R$: ")
+            conta.sacar(valor)
+            limpar_tela()
+            print('\n*********** Saque ***********\n')
+            conta.exibir_dados_conta_especifica(num_conta)
+
+            input('\nSaque realizado com sucesso! Tecle algo para voltar ao menu principal... ')
+    else:
+        input('\nNao ha contas cadastradas! Tecle algo para voltar ao menu principal... ')
 
 def efetuar_transferencia():
     pass

@@ -117,45 +117,88 @@ class Conta:
         else:
             print('\nNao ha contas cadastradas!')
 
-    def exibir_dados_conta_especifica(self, num_conta: int) -> None:
+    def exibir_dados_conta_especifica(self, num_conta: str) -> None:
         if Conta.contas:
-            print('\n*********** Deposito ***********\n')
-            dados_conta = list(filter(lambda i: i['_num_conta'] == num_conta, Conta.contas))
+            dados_conta = list(filter(lambda i: i['_num_conta'] == int(num_conta), Conta.contas))
             print(f'{dados_conta[0]["_nome"].title().ljust(20)} \nConta = {str(dados_conta[0]["_num_conta"]).zfill(4)} \nSaldo R$ {dados_conta[0]["_saldo"]}\n')
+
+            self._num_conta = int(num_conta)
+            self._saldo = dados_conta[0]["_saldo"]
 
     def salvar(self) -> None:
         Conta.contas.append(self.__dict__)
         with open(Conta.arquivo, 'w+') as f:
             json.dump(Conta.contas, f)
 
-    def depositar(self, valor_dep: str) -> None:
+    def depositar(self, valor: str) -> None:
         #Continua no loop enquanto informar um valor invalido
         while True:
             try:
-                f_valor_dep = float(valor_dep)
+                f_valor = float(valor)
             except:
                 print('Valor invalido! Tente novamente...')
                 deletar_ultimas_linhas(qtde_linhas=2, espera=2)
-                valor_dep = input("Informe o valor do deposito R$: ")
+                valor = input("Informe o valor do deposito R$: ")
             else:
-                if f_valor_dep > 1000:
+                if f_valor > 1000.00:
                     print('Valor maximo permitido por deposito é de R$ 1.000! Tente novamente...')
                     deletar_ultimas_linhas(qtde_linhas=2, espera=2)
-                    valor_dep = input("Informe o valor do deposito R$: ")
-                elif f_valor_dep < 5:
+                    valor = input("Informe o valor do deposito R$: ")
+                elif f_valor < 5.0:
                     print('Valor minimo permitido por deposito é de R$ 5.00! Tente novamente...')
                     deletar_ultimas_linhas(qtde_linhas=2, espera=2)
-                    valor_dep = input("Informe o valor do deposito R$: ")
+                    valor = input("Informe o valor do deposito R$: ")
                 else:
                     break
         
-        #Efetua deposito
-        linha = list(count for count, value in enumerate(Conta.contas) if value["_num_conta"] == self._num_conta)[0]
-        saldo_atual = float(Conta.contas[linha]["_saldo"]) + f_valor_dep
-        Conta.contas[linha]["_saldo"] = saldo_atual
+        #Efetua DEPOSITO
+
+        # Recupera linha da lista onde esta conta onde sera feito deposito
+        linha = list(index for index, conta in enumerate(Conta.contas) if conta["_num_conta"] == self._num_conta)[0]
+
+        # Soma saldo atual com valor deposito
+        Conta.contas[linha]["_saldo"] = self._saldo + f_valor
 
         with open(Conta.arquivo, 'w') as f:
             json.dump(Conta.contas, f)
+        #---------------------------------------------------------------------------------------------------------------
+
+    def sacar(self, valor: str) -> None:
+        # Continua no loop enquanto informar um valor invalido
+        while True:
+            try:
+                f_valor = float(valor)
+            except:
+                print('Valor invalido! Tente novamente...')
+                deletar_ultimas_linhas(qtde_linhas=2, espera=2)
+                valor = input("Informe o valor do saque R$: ")
+            else:
+                if f_valor > 1000:
+                    print('Valor maximo permitido por saque é de R$ 1.000! Tente novamente...')
+                    deletar_ultimas_linhas(qtde_linhas=2, espera=2)
+                    valor = input("Informe o valor do saque R$: ")
+                elif f_valor < 5:
+                    print('Valor minimo permitido por saque é de R$ 5.00! Tente novamente...')
+                    deletar_ultimas_linhas(qtde_linhas=2, espera=2)
+                    valor = input("Informe o valor do saque R$: ")
+                elif f_valor > self._saldo:
+                    print('Saldo insuficiente! Tente novamente...')
+                    deletar_ultimas_linhas(qtde_linhas=2, espera=2)
+                    valor = input("Informe o valor do saque R$: ")
+                else:
+                    break
+
+        # Efetua SAQUE--- ----------------------------------------------------------------------------------------------
+
+        # Recupera linha da lista onde esta conta onde sera feito saque
+        linha = list(index for index, conta in enumerate(Conta.contas) if conta["_num_conta"] == self._num_conta)[0]
+
+        # Subtrai saldo atual com valor saque
+        Conta.contas[linha]["_saldo"] = self._saldo - f_valor
+
+        with open(Conta.arquivo, 'w') as f:
+            json.dump(Conta.contas, f)
+        #---------------------------------------------------------------------------------------------------------------
 
     def existe_cpf_cadastrado(self, cpf: str) -> bool:
         if Conta.contas:
@@ -176,9 +219,6 @@ class Conta:
                 num_conta = input("Informe o numero da conta (digite 0 para voltar ao menu principal): ")
             else:
                 if any(i['_num_conta'] == int_num_conta for i in Conta.contas):
-                    limpar_tela()
-                    self.exibir_dados_conta_especifica(int_num_conta)
-                    self._num_conta = int_num_conta
                     encontrou = True
                 else:
                     print('Numero de conta não existente! Tente novamente...')
