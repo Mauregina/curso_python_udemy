@@ -138,8 +138,8 @@ class Conta:
                 deletar_ultimas_linhas(qtde_linhas=2, espera=2)
                 valor_dep = input("Informe o valor do deposito R$: ")
             else:
-                if f_valor_dep > 10000:
-                    print('Valor maximo permitido por deposito é de R$ 10.000! Tente novamente...')
+                if f_valor_dep > 1000:
+                    print('Valor maximo permitido por deposito é de R$ 1.000! Tente novamente...')
                     deletar_ultimas_linhas(qtde_linhas=2, espera=2)
                     valor_dep = input("Informe o valor do deposito R$: ")
                 elif f_valor_dep < 5:
@@ -150,7 +150,12 @@ class Conta:
                     break
         
         #Efetua deposito
+        linha = list(count for count, value in enumerate(Conta.contas) if value["_num_conta"] == self._num_conta)[0]
+        saldo_atual = float(Conta.contas[linha]["_saldo"]) + f_valor_dep
+        Conta.contas[linha]["_saldo"] = saldo_atual
 
+        with open(Conta.arquivo, 'w') as f:
+            json.dump(Conta.contas, f)
 
     def existe_cpf_cadastrado(self, cpf: str) -> bool:
         if Conta.contas:

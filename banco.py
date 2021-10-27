@@ -30,6 +30,7 @@ def efetuar_deposito() -> None:
         if conta.existe_conta(num_conta):
             valor_dep = input("Informe o valor do deposito R$: ")
             conta.depositar(valor_dep)
+            input('\nDeposito realizado com sucesso! Tecle algo para voltar ao menu principal... ')
     else:
         input('\nNao ha contas cadastradas! Tecle algo para voltar ao menu principal... ')
 
