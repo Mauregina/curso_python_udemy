@@ -12,11 +12,19 @@ class Conta:
 
 # Getters e setter (inicio) --------------------------------------------------------------------------------------------
     @property
+    def num_conta(self) -> int:
+        return self._num_conta
+
+    @num_conta.setter
+    def num_conta(self, num_conta: int):
+        self._num_conta = num_conta
+
+    @property
     def nome(self) -> str:
         return self._nome
 
     @nome.setter
-    def nome(self, nome):
+    def nome(self, nome: str):
         while True:
             if len(nome) == 0:
                 print('Nome deve ser informado! Tente novamente...')
@@ -35,7 +43,7 @@ class Conta:
         return self._email
 
     @email.setter
-    def email(self, email):
+    def email(self, email: str):
         while True:
             if len(email) == 0:
                 print('E-mail deve ser informado! Tente novamente...')
@@ -58,7 +66,7 @@ class Conta:
         return self._cpf
 
     @cpf.setter
-    def cpf(self, cpf):
+    def cpf(self, cpf: str):
         while True:
             if len(cpf) == 0:
                 print('CPF deve ser informado! Tente novamente...')
@@ -81,7 +89,7 @@ class Conta:
         return self._data_nascimento
 
     @data_nascimento.setter
-    def data_nascimento(self, data_nascimento):
+    def data_nascimento(self, data_nascimento: str):
         while True:
             if len(data_nascimento) == 0:
                 print('Data de nascimento deve ser informado! Tente novamente...')
@@ -117,13 +125,13 @@ class Conta:
         else:
             print('\nNao ha contas cadastradas!')
 
-    def exibir_dados_conta_especifica(self, num_conta: str) -> None:
+    def exibir_dados_conta_especifica(self, num_conta = None) -> None:
         if Conta.contas:
-            dados_conta = list(filter(lambda i: i['_num_conta'] == int(num_conta), Conta.contas))
+            if num_conta is None:
+                dados_conta = list(filter(lambda i: i['_num_conta'] == self._num_conta, Conta.contas))
+            else:
+                dados_conta = list(filter(lambda i: i['_num_conta'] == num_conta, Conta.contas))
             print(f'{dados_conta[0]["_nome"].title().ljust(20)} \nConta = {str(dados_conta[0]["_num_conta"]).zfill(4)} \nSaldo R$ {dados_conta[0]["_saldo"]}\n')
-
-            self._num_conta = int(num_conta)
-            self._saldo = dados_conta[0]["_saldo"]
 
     def salvar(self) -> None:
         Conta.contas.append(self.__dict__)
@@ -157,7 +165,7 @@ class Conta:
         linha = list(index for index, conta in enumerate(Conta.contas) if conta["_num_conta"] == self._num_conta)[0]
 
         # Soma saldo atual com valor deposito
-        Conta.contas[linha]["_saldo"] = self._saldo + f_valor
+        Conta.contas[linha]["_saldo"] += f_valor
 
         with open(Conta.arquivo, 'w') as f:
             json.dump(Conta.contas, f)
@@ -181,7 +189,7 @@ class Conta:
                     print('Valor minimo permitido por saque é de R$ 5.00! Tente novamente...')
                     deletar_ultimas_linhas(qtde_linhas=2, espera=2)
                     valor = input("Informe o valor do saque R$: ")
-                elif f_valor > self._saldo:
+                elif not self.existe_saldo_suficiente(f_valor):
                     print('Saldo insuficiente! Tente novamente...')
                     deletar_ultimas_linhas(qtde_linhas=2, espera=2)
                     valor = input("Informe o valor do saque R$: ")
@@ -194,11 +202,23 @@ class Conta:
         linha = list(index for index, conta in enumerate(Conta.contas) if conta["_num_conta"] == self._num_conta)[0]
 
         # Subtrai saldo atual com valor saque
-        Conta.contas[linha]["_saldo"] = self._saldo - f_valor
+        Conta.contas[linha]["_saldo"] -= f_valor
 
         with open(Conta.arquivo, 'w') as f:
             json.dump(Conta.contas, f)
         #---------------------------------------------------------------------------------------------------------------
+
+    def existe_saldo_zerado(self) -> bool:
+        if Conta.contas:
+            return any((i['_num_conta'] == self._num_conta and i['_saldo'] == 0.0) for i in Conta.contas)
+        else:
+            return False
+
+    def existe_saldo_suficiente(self, valor: float) -> bool:
+        if Conta.contas:
+            return any((i['_num_conta'] == self._num_conta and i['_saldo'] >= valor) for i in Conta.contas)
+        else:
+            return False
 
     def existe_cpf_cadastrado(self, cpf: str) -> bool:
         if Conta.contas:

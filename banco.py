@@ -29,14 +29,15 @@ def efetuar_deposito() -> None:
 
         if conta.existe_conta(num_conta):
             limpar_tela()
+            conta.num_conta = int(num_conta)
             print('\n*********** Deposito ***********\n')
-            conta.exibir_dados_conta_especifica(num_conta)
+            conta.exibir_dados_conta_especifica()
 
             valor = input("Informe o valor do deposito R$: ")
             conta.depositar(valor)
             limpar_tela()
             print('\n*********** Deposito ***********\n')
-            conta.exibir_dados_conta_especifica(num_conta)
+            conta.exibir_dados_conta_especifica()
 
             input('\nDeposito realizado com sucesso! Tecle algo para voltar ao menu principal... ')
     else:
@@ -51,21 +52,75 @@ def efetuar_saque() -> None:
 
         if conta.existe_conta(num_conta):
             limpar_tela()
+            conta.num_conta = int(num_conta)
             print('\n*********** Saque ***********\n')
-            conta.exibir_dados_conta_especifica(num_conta)
+            conta.exibir_dados_conta_especifica()
 
-            valor = input("Informe o valor do saque R$: ")
-            conta.sacar(valor)
-            limpar_tela()
-            print('\n*********** Saque ***********\n')
-            conta.exibir_dados_conta_especifica(num_conta)
+            if conta.existe_saldo_zerado():
+                print("Saque nao pode ser realizado! Motivo: saldo da conta zerado.\n")
+                input("Tecle algo para voltar ao menu principal... ")
+            else:
+                valor = input("Informe o valor do saque R$: ")
+                conta.sacar(valor)
+                limpar_tela()
+                print('\n*********** Saque ***********\n')
+                conta.exibir_dados_conta_especifica()
 
-            input('\nSaque realizado com sucesso! Tecle algo para voltar ao menu principal... ')
+                input('\nSaque realizado com sucesso! Tecle algo para voltar ao menu principal... ')
     else:
         input('\nNao ha contas cadastradas! Tecle algo para voltar ao menu principal... ')
 
 def efetuar_transferencia():
-    pass
+    conta = Conta(novo = False)
+    print('\n*********** Transferencia ***********\n')
+
+    if Conta.contas:
+       # Conta ORIGEM --------------------------------------------------------------------------------------------------
+        num_conta = input("Informe o numero da conta (digite 0 para voltar ao menu principal): ")
+
+        if conta.existe_conta(num_conta):
+            limpar_tela()
+            conta.num_conta = int(num_conta)
+            print('\n*********** Transferencia ***********\n')
+            print('ORIGEM')
+            conta.exibir_dados_conta_especifica()
+
+            if conta.existe_saldo_zerado():
+                print("Transferencia nao pode ser realizada! Motivo: saldo da conta zerado.\n")
+                input("Tecle algo para voltar ao menu principal... ")
+
+        # Conta DESTINO ------------------------------------------------------------------------------------------------
+            else:
+                num_conta_destino = input("Informe o numero da conta destino (digite 0 para voltar ao menu principal): ")
+
+                if conta.existe_conta(num_conta_destino):
+                    deletar_ultimas_linhas(qtde_linhas=1, espera=0)
+                    print('DESTINO')
+                    int_num_conta_destino = int(num_conta_destino)
+                    conta.exibir_dados_conta_especifica(int_num_conta_destino)
+
+                    if conta.num_conta == int_num_conta_destino:
+                        print("Transferencia nao pode ser realizada! Motivo: conta origem igual a conta destino.\n")
+                        input("Tecle algo para voltar ao menu principal... ")
+
+                    # realiza TRANSFERENCIA entre contras
+                    else:
+                        valor = input("Informe o valor da transferencia R$: ")
+                        conta.sacar(valor)
+                        conta.num_conta = int_num_conta_destino
+                        conta.depositar(valor)
+                        limpar_tela()
+                        print('\n*********** Transferencia ***********\n')
+                        conta.num_conta = int(num_conta)
+                        print('ORIGEM')
+                        conta.exibir_dados_conta_especifica()
+                        conta.num_conta = int_num_conta_destino
+                        print('DESTINO')
+                        conta.exibir_dados_conta_especifica()
+
+                        input('\nTransferencia realizada com sucesso! Tecle algo para voltar ao menu principal... ')
+    else:
+        input('\nNao ha contas cadastradas! Tecle algo para voltar ao menu principal... ')
 
 def menu() -> bool:
     inicar_banco()
