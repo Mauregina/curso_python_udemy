@@ -7,4 +7,5 @@
 <h1 align="center"> Projeto Mercado</h1>
 <p align="justify">Descrição: <br><b>Ao ser iniciada, a aplicação apresenta ao usuário um menu onde é possível cadastrar produtos e realizar comprar de produtos, além de sair da aplicação. Ao adicionar um produto no carrinho de compras, a aplicação verifica se já existe um mesmo produto no carrinho, alterar apenas a quantidade. Ao finalizar a compra é apresentado ao usuário o total de acordo com os produtos e quantidades inseridas no carrinho de compra.</b></p>
 <br><br>
-<p align="justify">Informações adicionais: <br><i>Este projeto refere-se a um dos trabalhos requeridos para conclusão do curso "Programação em Python do básico ao avançado".</b></i>
+<p align="justify">Informações adicionais: <br><i>Este projeto refere-se a um dos trabalhos requeridos para conclusão do curso "Programação em Python do básico ao avançado". Este repositório contém também notebook com alguns exercícios visando fixar alguns tópicos estudados durante curso de Python.</b></i>
+
