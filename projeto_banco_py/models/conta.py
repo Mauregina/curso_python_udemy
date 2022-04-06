@@ -5,10 +5,9 @@ class Conta:
     arquivo = 'utils/contas.json'
     contas = []
 
-    def __init__(self, novo: bool):
-        if novo:
-            self._num_conta: int = self.gerar_num_conta()
-            self._saldo: float = 0.0
+    def __init__(self):
+        self._num_conta: int = self.gerar_num_conta()
+        self._saldo: float = 0.0
 
 # Getters e setter (inicio) --------------------------------------------------------------------------------------------
     @property
@@ -111,26 +110,30 @@ class Conta:
         else:
             return 1
 
-    def resgatar_contas_cadastradas(self):
-        if os.path.isfile(self.arquivo):
-            Conta.contas = json.load(open(self.arquivo))
+    @classmethod
+    def resgatar_contas_cadastradas(cls):
+        if os.path.isfile(cls.arquivo):
+            cls.contas = json.load(open(cls.arquivo))
 
-    def exibir_dados_contas(self) -> None:
-        if Conta.contas:
+    @classmethod
+    def exibir_dados_contas(cls) -> None:
+        if cls.contas:
             print('\n*********** Lista de Contas ***********\n')
 
-            for i in Conta.contas:
+            for i in cls.contas:
                 print(f'{i["_nome"].title().ljust(20)} \nConta = {str(i["_num_conta"]).zfill(4)} \nSaldo R$ {i["_saldo"]}')
                 print('--------------------')
         else:
             print('\nNao ha contas cadastradas!')
 
-    def exibir_dados_conta_especifica(self, num_conta = None) -> None:
-        if Conta.contas:
+    @classmethod
+    def exibir_dados_conta_especifica(cls, num_conta = None) -> None:
+        if cls.contas:
             if num_conta is None:
-                dados_conta = list(filter(lambda i: i['_num_conta'] == self._num_conta, Conta.contas))
+                pass
+                # dados_conta = list(filter(lambda i: i['_num_conta'] == self._num_conta, Conta.contas))
             else:
-                dados_conta = list(filter(lambda i: i['_num_conta'] == num_conta, Conta.contas))
+                dados_conta = list(filter(lambda i: i['_num_conta'] == num_conta, cls.contas))
             print(f'{dados_conta[0]["_nome"].title().ljust(20)} \nConta = {str(dados_conta[0]["_num_conta"]).zfill(4)} \nSaldo R$ {dados_conta[0]["_saldo"]}\n')
 
     def salvar(self) -> None:
@@ -138,7 +141,8 @@ class Conta:
         with open(Conta.arquivo, 'w+') as f:
             json.dump(Conta.contas, f)
 
-    def depositar(self, valor: str) -> None:
+    @classmethod
+    def depositar(cls, num_conta: int, valor: str) -> None:
         #Continua no loop enquanto informar um valor invalido
         while True:
             try:
@@ -162,16 +166,17 @@ class Conta:
         #Efetua DEPOSITO
 
         # Recupera linha da lista onde esta conta onde sera feito deposito
-        linha = list(index for index, conta in enumerate(Conta.contas) if conta["_num_conta"] == self._num_conta)[0]
+        linha = list(index for index, conta in enumerate(cls.contas) if conta["_num_conta"] == num_conta)[0]
 
         # Soma saldo atual com valor deposito
-        Conta.contas[linha]["_saldo"] += f_valor
+        cls.contas[linha]["_saldo"] += f_valor
 
-        with open(Conta.arquivo, 'w') as f:
+        with open(cls.arquivo, 'w') as f:
             json.dump(Conta.contas, f)
         #---------------------------------------------------------------------------------------------------------------
 
-    def sacar(self, valor: str) -> None:
+    @classmethod
+    def sacar(cls, num_conta: int, valor: str) -> None:
         # Continua no loop enquanto informar um valor invalido
         while True:
             try:
@@ -189,7 +194,7 @@ class Conta:
                     print('Valor minimo permitido por saque é de R$ 5.00! Tente novamente...')
                     deletar_ultimas_linhas(qtde_linhas=2, espera=2)
                     valor = input("Informe o valor do saque R$: ")
-                elif not self.existe_saldo_suficiente(f_valor):
+                elif not cls.existe_saldo_suficiente(num_conta, f_valor):
                     print('Saldo insuficiente! Tente novamente...')
                     deletar_ultimas_linhas(qtde_linhas=2, espera=2)
                     valor = input("Informe o valor do saque R$: ")
@@ -199,26 +204,14 @@ class Conta:
         # Efetua SAQUE--- ----------------------------------------------------------------------------------------------
 
         # Recupera linha da lista onde esta conta onde sera feito saque
-        linha = list(index for index, conta in enumerate(Conta.contas) if conta["_num_conta"] == self._num_conta)[0]
+        linha = list(index for index, conta in enumerate(cls.contas) if conta["_num_conta"] == num_conta)[0]
 
         # Subtrai saldo atual com valor saque
-        Conta.contas[linha]["_saldo"] -= f_valor
+        cls.contas[linha]["_saldo"] -= f_valor
 
         with open(Conta.arquivo, 'w') as f:
-            json.dump(Conta.contas, f)
+            json.dump(cls.contas, f)
         #---------------------------------------------------------------------------------------------------------------
-
-    def existe_saldo_zerado(self) -> bool:
-        if Conta.contas:
-            return any((i['_num_conta'] == self._num_conta and i['_saldo'] == 0.0) for i in Conta.contas)
-        else:
-            return False
-
-    def existe_saldo_suficiente(self, valor: float) -> bool:
-        if Conta.contas:
-            return any((i['_num_conta'] == self._num_conta and i['_saldo'] >= valor) for i in Conta.contas)
-        else:
-            return False
 
     def existe_cpf_cadastrado(self, cpf: str) -> bool:
         if Conta.contas:
@@ -226,7 +219,22 @@ class Conta:
         else:
             return False
 
-    def existe_conta(self, num_conta: str) -> bool:
+    @classmethod
+    def existe_saldo_zerado(cls, num_conta: int) -> bool:
+        if Conta.contas:
+            return any((i['_num_conta'] == num_conta and i['_saldo'] == 0.0) for i in cls.contas)
+        else:
+            return False
+
+    @classmethod
+    def existe_saldo_suficiente(cls, num_conta: str, valor: float) -> bool:
+        if cls.contas:
+            return any((i['_num_conta'] == num_conta and i['_saldo'] >= valor) for i in cls.contas)
+        else:
+            return False
+
+    @classmethod
+    def existe_conta(cls, num_conta: str) -> bool:
         encontrou = False
 
         #Continua no loop enquanto nao informar conta existente ou digitar 0
@@ -238,7 +246,7 @@ class Conta:
                 deletar_ultimas_linhas(qtde_linhas=2, espera=2)
                 num_conta = input("Informe o numero da conta (digite 0 para voltar ao menu principal): ")
             else:
-                if any(i['_num_conta'] == int_num_conta for i in Conta.contas):
+                if any(i['_num_conta'] == int_num_conta for i in cls.contas):
                     encontrou = True
                 else:
                     print('Numero de conta não existente! Tente novamente...')
